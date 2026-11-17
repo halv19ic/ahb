@@ -1,0 +1,264 @@
+m255
+K4
+z2
+!s99 nomlopt
+!s11f vlog 2021.2_1 2021.05, May 15 2021
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 d/home/vinhha/x/ahb/ahb_s/sim
+T_opt
+!s11d test_pkg /home/vinhha/x/ahb/ahb_s/sim/work 1 dut_if 1 /home/vinhha/x/ahb/ahb_s/sim/work 
+!s11d ahb_pkg /home/vinhha/x/ahb/ahb_s/sim/work 1 dut_if 1 /home/vinhha/x/ahb/ahb_s/sim/work 
+!s110 1794729382
+VcG:3h_00>i?fKJkgTl4UT2
+04 9 4 work testbench fast 0
+=1-000ae431a4f1-6af965a6-66115-1b2e
+!s124 OEM100
+o-quiet -auto_acc_if_foreign -work work -debugdb +acc
+Z1 tCvgOpt 0
+n@_opt
+OL;O;2021.2_1;73
+Xahb_pkg
+Z2 !s115 dut_if
+Z3 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+Z4 !s110 1794729376
+!i10b 1
+!s100 NXN3=I?;dh=:RGX6jEL=;1
+Ia`f0WfOi:zIMnfUHD>7B>0
+S1
+R0
+w1794238718
+8../tb/ahb_pkg.sv
+F../tb/ahb_pkg.sv
+F../tb/packet.sv
+F../tb/stimulus.sv
+F../tb/driver.sv
+F../tb/monitor.sv
+F../tb/scoreboard.sv
+F../tb/environment.sv
+!i122 0
+Z5 L0 1 0
+Va`f0WfOi:zIMnfUHD>7B>0
+Z6 OL;L;2021.2_1;73
+r1
+!s85 0
+31
+Z7 !s108 1794729375.000000
+Z8 !s107 ../testcase/ahb_error_test.sv|../testcase/ahb_burst_test.sv|../testcase/base_test.sv|../tb/environment.sv|../tb/scoreboard.sv|../tb/monitor.sv|../tb/driver.sv|../tb/stimulus.sv|../tb/packet.sv|../tb/testbench.sv|../tb/dut_interface.sv|../testcase/test_pkg.sv|../tb/ahb_pkg.sv|../rtl/regfile.sv|../rtl/ahb_s_bk.sv|../rtl/ahb_s_top.sv|../rtl/dff.sv|../rtl/dff_rstn.sv|
+Z9 !s90 -sv|-f|compile.f|
+!i113 0
+Z10 o-sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z11 !s92 -sv +incdir+../tb +incdir+../testcase -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R1
+vahb_s
+R3
+R4
+!i10b 1
+!s100 fo5;fhVQn[hGb[<OYk3]O2
+IQHEDUlO_=>]b5>akF25;E1
+S1
+R0
+w1794240674
+8../rtl/ahb_s_bk.sv
+F../rtl/ahb_s_bk.sv
+!i122 0
+L0 4 200
+Z12 VDg1SIo80bB@j0V0VzS_@n1
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 0
+R10
+R11
+R1
+vahb_s_top
+R3
+R4
+!i10b 1
+!s100 1;`V6>S[k1gPWDE8^YWD[1
+IgBNU]A5KS>]foZIjf4C5I3
+S1
+R0
+w1794198199
+8../rtl/ahb_s_top.sv
+F../rtl/ahb_s_top.sv
+!i122 0
+L0 2 91
+R12
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 0
+R10
+R11
+R1
+vdff
+R3
+R4
+!i10b 1
+!s100 ;MkPOJnz95gTB^YnjWIB]3
+Ig0Vc_17f^D>90^3UG3>Nb2
+S1
+R0
+w1793892216
+8../rtl/dff.sv
+F../rtl/dff.sv
+!i122 0
+L0 11 10
+R12
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 0
+R10
+R11
+R1
+vdff_rstn
+R3
+R4
+!i10b 1
+!s100 aACD0dA4B3]z^iKVeK8O?1
+IVLFQHZf3Ig0VXZM24;hC82
+S1
+R0
+w1793892144
+8../rtl/dff_rstn.sv
+F../rtl/dff_rstn.sv
+!i122 0
+L0 11 12
+R12
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 0
+R10
+R11
+R1
+Ydut_if
+R3
+Z13 DXx4 work 7 ahb_pkg 0 22 a`f0WfOi:zIMnfUHD>7B>0
+R4
+!i10b 1
+!s100 haCVWZ[QOh>U6Z2l?z>`40
+IK>UZAe20GM65PL;<9hGGn0
+S1
+R0
+w1794232706
+8../tb/dut_interface.sv
+F../tb/dut_interface.sv
+!i122 0
+R5
+R12
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 0
+R10
+R11
+R1
+vregfile
+R3
+R4
+!i10b 1
+!s100 ^ddQRk9c@P62zXH298<VX1
+ID=HOgRb`Rba;^cJeKeMN23
+S1
+R0
+w1793850923
+8../rtl/regfile.sv
+F../rtl/regfile.sv
+!i122 0
+L0 1 46
+R12
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 0
+R10
+R11
+R1
+Xtest_pkg
+R2
+R3
+R13
+R4
+!i10b 1
+!s100 1>8m5dNE^HM5HUL8mI5m00
+I4]0CdMMlQ7e[NVFGOoFGl2
+S1
+R0
+w1794233877
+8../testcase/test_pkg.sv
+F../testcase/test_pkg.sv
+F../testcase/base_test.sv
+F../testcase/ahb_burst_test.sv
+F../testcase/ahb_error_test.sv
+!i122 0
+L0 11 0
+V4]0CdMMlQ7e[NVFGOoFGl2
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 0
+R10
+R11
+R1
+vtestbench
+R3
+R13
+DXx4 work 8 test_pkg 0 22 4]0CdMMlQ7e[NVFGOoFGl2
+R4
+!i10b 1
+!s100 CDgS<`Hb<MB3;<FAhfW`^0
+Io_H>Gb8R?8oWk2o8g:_;E1
+S1
+R0
+w1794233815
+8../tb/testbench.sv
+F../tb/testbench.sv
+!i122 0
+L0 2 112
+R12
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 0
+R10
+R11
+R1

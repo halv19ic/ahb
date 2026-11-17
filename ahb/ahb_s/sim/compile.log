@@ -1,0 +1,19 @@
+QuestaSim-64 vlog 2021.2_1 Compiler 2021.05 May 15 2021
+Start time: 14:56:15 on Nov 15,2026
+vlog -sv -f compile.f 
+-- Compiling module dff_rstn
+-- Compiling module dff
+-- Compiling module ahb_s_top
+-- Compiling module ahb_s
+-- Compiling module regfile
+-- Compiling package ahb_pkg
+-- Compiling package test_pkg
+-- Importing package ahb_pkg
+-- Compiling interface dut_if
+-- Compiling module testbench
+-- Importing package test_pkg
+
+Top level modules:
+	testbench
+End time: 14:56:16 on Nov 15,2026, Elapsed time: 0:00:01
+Errors: 0, Warnings: 0

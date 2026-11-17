@@ -1,0 +1,32 @@
+# //  Questa Sim-64
+# //  Version 2021.2_1 linux_x86_64 May 15 2021
+# //
+# //  Copyright 1991-2021 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# vsim.wlf opened as dataset "vsim"
+# add wave -r sim:/testbench/*
+# Unrecognized dataset prefix: sim
+#  radix -hexadecimal
+# hexadecimal
+# 
+# stdin: <EOF>
+do wave.do
+add wave -position insertpoint  \
+vsim:/testbench/dut/u_ahb_m/hsize_d
+dataset reload -f
+# vsim:/testbench/dut/u_ahb_m
+dataset reload -f
+# vsim:/testbench/dut/u_ahb_m
+find drivers -source -time {302896 ps} -cause vsim:/testbench/dut/u_ahb_m/nxt_trans_vld
+dataset reload -f
+# doVOpenFlatFile(): INTERNAL ERROR: page load failed for file /home/vinhha/x/ahb/ahb_m/sim/work/dff_rstn/_primary.dbs (0:0 1:1 71 0 405 1794908505 0x10b:0x101)
+# vsim:/testbench/dut/u_ahb_s/u_ahb_s/r_hrdo

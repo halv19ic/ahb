@@ -1,6 +1,6 @@
 QuestaSim-64 vlog 2021.2_1 Compiler 2021.05 May 15 2021
-Start time: 10:21:26 on Nov 18,2026
-vlog -sv -f compile.f 
+Start time: 17:38:53 on Nov 18,2026
+vlog -sv -lint -f compile.f 
 -- Compiling module dff_rstn
 -- Compiling module dff
 -- Compiling module ahb_top
@@ -12,5 +12,5 @@ vlog -sv -f compile.f
 
 Top level modules:
 	testbench
-End time: 10:21:26 on Nov 18,2026, Elapsed time: 0:00:00
+End time: 17:38:54 on Nov 18,2026, Elapsed time: 0:00:01
 Errors: 0, Warnings: 0

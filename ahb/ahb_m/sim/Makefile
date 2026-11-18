@@ -18,7 +18,7 @@ all: build run
 build:
 	vlib work
 	vmap work work
-	vlog -sv -f compile.f 2>&1 | tee compile.log
+	vlog -sv -lint -f compile.f 2>&1 | tee compile.log
 
 run:
 	vsim -sv_seed $(SEED) -debugDB -l $(TESTNAME).log -voptargs=+acc -assertdebug -c $(TB_NAME) +TESTNAME=$(TESTNAME) -do "log -r /*; run -all; quit -f"

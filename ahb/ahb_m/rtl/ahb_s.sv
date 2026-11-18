@@ -13,27 +13,27 @@ input  logic                clk,
 input  logic                rstn,
 
 // Select
-input  logic                hsel_i,
+input  logic                HSEL_i,
 
 // Address
-input  logic [ADDR_W-1:0]   haddr_i,
+input  logic [ADDR_W-1:0]   HADDR_i,
 
 // Data
-input  logic [DATA_W-1:0]   hwdata_i,
+input  logic [DATA_W-1:0]   HWDATA_i,
 
 // Control Signals
-input  logic                hwrite_i,
-input  logic [2:0]          hburst_i,
-input  logic [2:0]          hsize_i,
-input  logic [1:0]          htrans_i,
-input  logic [3:0]          hprot_i,
-input  logic                hsmartlock_i,
-input  logic                hready_i,
+input  logic                HWRITE_i,
+input  logic [2:0]          HBURST_i,
+input  logic [2:0]          HSIZE_i,
+input  logic [1:0]          HTRANS_i,
+input  logic [3:0]          HPROT_i,
+input  logic                HSMARTLOCK_i,
+input  logic                HREADY_i,
 
 // Output AHB
-output logic [DATA_W-1:0]   hrdata_o,
-output logic                hresp_o,
-output logic                hreadyout_o,
+output logic [DATA_W-1:0]   HRDATA_o,
+output logic                HRESP_o,
+output logic                HREADYOUT_o,
 
 // Register Interface
 output logic [ADDR_W-1:0]   reg_addr_o,
@@ -89,22 +89,22 @@ logic                       hresp;
 
 
 // Address Phase Done - Enable enter Data Phase
-// hready_i indicates the DATA PHASE of previouse transfer have done that enables the current transfer enters DATA PHASE
-// htrans_i [1:0] - 00: IDLE, 01:BUSY  -> be ignored by subordinate
+// HREADY_i indicates the DATA PHASE of previouse transfer have done that enables the current transfer enters DATA PHASE
+// HTRANS_i [1:0] - 00: IDLE, 01:BUSY  -> be ignored by subordinate
 //                - 10: NONSEQ, 11:SEQ -> suitable transfer 
-assign ap_done = hready_i    &
-                 htrans_i[1] &
-                 hsel_i;
+assign ap_done = HREADY_i    &
+                 HTRANS_i[1] &
+                 HSEL_i;
 
 // Data Phase Valid
-assign dp_vld_d = hready_i ? ap_done : dp_vld;
+assign dp_vld_d = HREADY_i ? ap_done : dp_vld;
 dff_rstn #(1) r_dp_vld (.clk(clk), .rstn(rstn), .d(dp_vld_d), .q(dp_vld));
 
 // Update Control Signasl - New Transfer
-assign haddr_d  = ap_done ? haddr_i  : haddr_r;
-assign hwrite_d = ap_done ? hwrite_i : hwrite_r;
-assign hsize_d  = ap_done ? hsize_i  : hsize_r;
-assign htrans_d = ap_done ? htrans_i : htrans_r;
+assign haddr_d  = ap_done ? HADDR_i  : haddr_r;
+assign hwrite_d = ap_done ? HWRITE_i : hwrite_r;
+assign hsize_d  = ap_done ? HSIZE_i  : hsize_r;
+assign htrans_d = ap_done ? HTRANS_i : htrans_r;
 
 dff_rstn #(1) r_hwr (.clk(clk), .rstn(rstn), .d(hwrite_d), .q(hwrite_r));
 dff_rstn #(3) r_hsz (.clk(clk), .rstn(rstn), .d(hsize_d), .q(hsize_r));
@@ -116,14 +116,14 @@ dff_rstn #(ADDR_W) r_addr (.clk(clk), .rstn(rstn), .d(haddr_r), .q(reg_addr_o));
 
 // Address Check 
 //.Check Range Address - 1KB Address Boundary
-assign addr_range_err =  ((haddr_i<ADDR_BASE) || 
-                          (haddr_i >= (ADDR_BASE + 1024)));
+assign addr_range_err =  ((HADDR_i<ADDR_BASE) || 
+                          (HADDR_i >= (ADDR_BASE + 1024)));
 
 //.Check Address Size   
-assign addr_size_err  =  (hsize_i > MAX_HSIZE); 
+assign addr_size_err  =  (HSIZE_i > MAX_HSIZE); 
 
 //.Check Aligned Address 
-assign addr_aligned_err = |(haddr_i & ((ADDR_W'(1) << hsize_i) - 1'b1));
+assign addr_aligned_err = |(HADDR_i & ((ADDR_W'(1) << HSIZE_i) - 1'b1));
 
 //.Address Error
 assign addr_err =   addr_range_err ||
@@ -135,11 +135,11 @@ dff_rstn #(1) r_addr_err (.clk(clk), .rstn(rstn), .d(addr_err_d), .q(addr_err_r)
 
 //Write Data
 assign wr_en = hwrite_r    &
-               hreadyout_o &
+               HREADYOUT_o &
                ~addr_err_r &
                dp_vld;
 dff_rstn #(1) r_wen (.clk(clk), .rstn(rstn), .d(wr_en), .q(reg_wen_o));
-dff #(DATA_W) r_wdata (.clk(clk), .d(hwdata_i), .q(reg_wdata_o));
+dff #(DATA_W) r_wdata (.clk(clk), .d(HWDATA_i), .q(reg_wdata_o));
 
 //Read Data
 logic re_pending_d;
@@ -151,7 +151,7 @@ assign rd_en = ~hwrite_r         &
                (wait_cnt_d=='0)  &
                ~re_pending_r;
 
-assign re_pending_d = hready_i ? 1'b0 : 
+assign re_pending_d = HREADY_i ? 1'b0 : 
                       rd_en  ? 1'b1 : re_pending_r;
 
 dff_rstn #(1) r_re_pending (.clk(clk), .rstn(rstn), .d(re_pending_d), .q(re_pending_r));
@@ -161,11 +161,11 @@ dff_rstn #(1) r_ren (.clk(clk), .rstn(rstn), .d(rd_en), .q(reg_ren_o));
 logic [DATA_W-1:0] rdata;
 assign rdata = err_vld ? '0 : reg_rdata_i;
 
-dff_rstn #(DATA_W) r_rdata (.clk(clk), .rstn(rstn), .d(rdata), .q(hrdata_o));
+dff_rstn #(DATA_W) r_rdata (.clk(clk), .rstn(rstn), .d(rdata), .q(HRDATA_o));
 
 
 // Response Error 
-// When err_vld asserted, the hresp_o enable transfer ERROR response
+// When err_vld asserted, the HRESP_o enable transfer ERROR response
 //The ERROR response requires two cycles.
 //To start the ERROR response, the Subordinate drives HRESP HIGH to indicate ERROR while driving HREADYOUT LOW to extend the transfer for one extra cycle. 
 //In the next cycle HREADYOUT is driven HIGH to end the transfer and HRESP remains driven HIGH to indicate ERROR.
@@ -178,19 +178,19 @@ assign err_vld = dp_vld_d          &
 
 
 // OKAY = 1'b0; ERROR = 1'b1
-dff_rstn #(1) r_resp_0 (.clk(clk), .rstn(rstn), .d(err_vld), .q(hresp_o));
+dff_rstn #(1) r_resp_0 (.clk(clk), .rstn(rstn), .d(err_vld), .q(HRESP_o));
 
-assign hresp_err_sec  = hresp_o & (~hready_i);
+assign hresp_err_sec  = HRESP_o & (~HREADY_i);
 dff_rstn #(1) r_resp_sec (.clk(clk), .rstn(rstn), .d(hresp_err_sec), .q(hresp_err_sec_r));
 
 //hreadyout
 assign hreadyout_d = (~dp_vld_d)                ? 1'b1 :
                      hresp_err_sec              ? 1'b1 :
-                     addr_err_d & (~hresp_o)    ? 1'b0 :
+                     addr_err_d & (~HRESP_o)    ? 1'b0 :
                      (wait_cnt_d!=0)            ? 1'b0 :  
                      hwrite_d                   ? 1'b1 : reg_rdata_vld_i;
 
-dff_rstn #(1) r_hrdo (.clk(clk), .rstn(rstn), .d(hreadyout_d), .q(hreadyout_o));
+dff_rstn #(1) r_hrdo (.clk(clk), .rstn(rstn), .d(hreadyout_d), .q(HREADYOUT_o));
 
 // Count Wait State
 assign wait_cnt_en = dp_vld_d & (wait_cnt != '0);

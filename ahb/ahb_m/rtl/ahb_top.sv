@@ -3,7 +3,7 @@
 // File         : ahb_top.sv
 // Author       : vinhha
 // Created      : 2026-11-15
-// Last Modified: 2026-11-16
+// Last Modified: 2026-11-18
 //==============================================================================
 // Description  :
 //
@@ -67,17 +67,17 @@ ahb_m #(
     .prot_i(prot_i),
     .busy_i(busy_i),
     .addr_i(addr_i),
-    .haddr_o(haddr),
-    .hburst_o(hburst),
-    .hsize_o(hsize),
-    .htrans_o(htrans),
-    .hprot_o(hprot),
-    .hsmartlock_o(hsmartlock),
-    .hwrite_o(hwrite),
-    .hwdata_o(hwdata),
-    .hready_i(hready),
-    .hrdata_i(hrdata),
-    .hresp_i(hresp)
+    .HADDR_o(haddr),
+    .HBURST_o(hburst),
+    .HSIZE_o(hsize),
+    .HTRANS_o(htrans),
+    .HPROT_o(hprot),
+    .HSMARTLOCK_o(hsmartlock),
+    .HWRITE_o(hwrite),
+    .HWDATA_o(hwdata),
+    .HREADY_i(hready),
+    .HRDATA_i(hrdata),
+    .HRESP_i(hresp)
 );
 
 //===================================

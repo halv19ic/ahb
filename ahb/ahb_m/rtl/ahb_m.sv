@@ -9,6 +9,12 @@
 //
 //==============================================================================
 
+//Outline
+//FSM
+//Beat_Counter
+//ADDRESS_GENERATOR
+//Transaction_Generator
+
 //HSIZE [2:0] indicates the size of data transfer
 //HSIZE [2:0] = 3'b000 - 1 byte
 //HSIZE [2:0] = 3'b001 - Halfword
@@ -24,7 +30,6 @@
 //INCR8  = 3'b101;
 //WRAP16 = 3'b110;
 //INCR16 = 3'b111;
-
 
 
 
@@ -54,19 +59,19 @@ input  logic [DATA_W-1:0]   wdata_i,
 
 
 //AHB Interface
-output logic [ADDR_W-1:0]   haddr_o, 
-output logic [2:0]          hburst_o, 
-output logic [2:0]          hsize_o, 
-output logic [1:0]          htrans_o, 
-output logic [3:0]          hprot_o, 
-output logic                hsmartlock_o , 
-output logic                hwrite_o , 
+output logic [ADDR_W-1:0]   HADDR_o, 
+output logic [2:0]          HBURST_o, 
+output logic [2:0]          HSIZE_o, 
+output logic [1:0]          HTRANS_o, 
+output logic [3:0]          HPROT_o, 
+output logic                HSMARTLOCK_o , 
+output logic                HWRITE_o , 
 
-output logic [DATA_W-1:0]   hwdata_o,
+output logic [DATA_W-1:0]   HWDATA_o,
 
-input  logic                hready_i, 
-input  logic [DATA_W-1:0]   hrdata_i, 
-input  logic                hresp_i 
+input  logic                HREADY_i, 
+input  logic [DATA_W-1:0]   HRDATA_i, 
+input  logic                HRESP_i 
 ); 
 ;
 localparam [2:0] HBURST_INCR   = 3'b001;
@@ -105,6 +110,7 @@ logic [7:0]                 bit_mask;
 logic [ADDR_W-1:0]          wrap_type;
 logic [ADDR_W-1:0]          operand_a;
 logic [ADDR_W-1:0]          operand_b;
+logic                       wrap_en;
 
 
 logic [2:0]                 hburst_d;
@@ -140,22 +146,28 @@ logic                   busy_to_burst;
 logic                   busy_to_idle;
 
 logic                   nxt_trans_vld;
+logic                   err_resp;
 
-assign nxt_trans_vld  = hready_i & dp_vld_r;
+//===================================
+
+assign nxt_trans_vld  = HREADY_i                & 
+                        dp_vld_d                ;
+
+assign  err_resp = (HRESP_i & (~HREADY_i));
+
 assign idle_to_single = (cmd_vld && (burst_i == 3'b000))  & (cur_state == ST_IDLE); 
 assign idle_to_burst  = (cmd_vld && (burst_i != 3'b000))  & (cur_state == ST_IDLE);  
 assign single_to_idle = nxt_trans_vld & 
                         (cur_state == ST_SINGLE);     
-assign burst_to_idle  = nxt_trans_vld           &
-                        (cur_state == ST_BURST) &
-                        last_beat;     
+assign burst_to_idle  = err_resp  | (nxt_trans_vld           &
+                                    (cur_state == ST_BURST)  &
+                                    last_beat);     
 
 assign burst_to_busy  = nxt_trans_vld           &
                         (cur_state == ST_BURST) &
                         (busy_i & dp_vld_r);     
-assign busy_to_burst  = nxt_trans_vld &
-                        (cur_state == ST_BUSY)  &
-                        ~(busy_i & dp_vld_r);     
+assign busy_to_burst  =  (cur_state == ST_BUSY)  &
+                        ~(busy_i);     
 assign busy_to_idle   = 1'b0;
 
 always_comb begin 
@@ -188,35 +200,35 @@ assign get_new_cmd = (nxt_state==ST_IDLE);
 dff_rstn #(1) r_cmd_ready (.clk(clk), .rstn(rstn), .d(get_new_cmd), .q(cmd_ready_o));
 
 //Hburst
-assign hburst_d = cmd_vld ? burst_i : hburst_o;
-dff_rstn #(3) r_hburst (.clk(clk), .rstn(rstn), .d(hburst_d), .q(hburst_o));
+assign hburst_d = cmd_vld ? burst_i : HBURST_o;
+dff_rstn #(3) r_hburst (.clk(clk), .rstn(rstn), .d(hburst_d), .q(HBURST_o));
 
 //Hsize
-assign hsize_d = cmd_vld ? size_i : hsize_o ;
-dff_rstn #(3) r_hsize (.clk(clk), .rstn(rstn), .d(hsize_d), .q(hsize_o));
+assign hsize_d = cmd_vld ? size_i : HSIZE_o ;
+dff_rstn #(3) r_hsize (.clk(clk), .rstn(rstn), .d(hsize_d), .q(HSIZE_o));
 
 
 //Read/Write
-assign hwrite_d = cmd_vld ? write_i : hwrite_o;
-dff_rstn #(1) r_write (.clk(clk), .rstn(rstn), .d(hwrite_d), .q(hwrite_o));
+assign hwrite_d = cmd_vld ? write_i : HWRITE_o;
+dff_rstn #(1) r_write (.clk(clk), .rstn(rstn), .d(hwrite_d), .q(HWRITE_o));
 
 //Write Data
-dff_rstn #(DATA_W) r_wdata (.clk(clk), .rstn(rstn), .d(wdata_i), .q(hwdata_o));
+dff_rstn #(DATA_W) r_wdata (.clk(clk), .rstn(rstn), .d(wdata_i), .q(HWDATA_o));
 
 
 //===================================
 //Address Phase
-assign ap_done = htrans_o[1] &
+assign ap_done = HTRANS_o[1] &
                  (cur_state != ST_IDLE)    &
-                 hready_i    ;
+                 HREADY_i    ;
 
 //Data Phase
-assign dp_vld_d = hready_i ? ap_done : dp_vld_r;
+assign dp_vld_d = HREADY_i ? ap_done : dp_vld_r;
 dff_rstn #(1) r_dp_vld (.clk(clk), .rstn(rstn), .d(dp_vld_d), .q(dp_vld_r));
 
 
 //===================================
-//Transaction Generator
+//Transaction_Generator
 
 logic idle_trans;
 logic busy_trans;
@@ -231,24 +243,27 @@ localparam [1:0] SEQ_TRANS    = 2'b11;
 
 assign idle_trans   = (nxt_state == ST_IDLE);
 assign busy_trans   = (nxt_state == ST_BUSY);
-assign nonseq_trans = (nxt_state == ST_SINGLE) ;
+assign nonseq_trans = (nxt_state == ST_SINGLE) |
+                      ((nxt_state == ST_BURST) & bcnt_d == 5'd0) ;
+assign seq_trans    = ((nxt_state == ST_BURST) & (bcnt_d != 5'd0)); 
                       //((nxt_state == BURST) & (bcnt_d == 5'd1));
 
 assign htrans_d = idle_trans   ? IDLE_TRANS   : 
                   busy_trans   ? BUSY_TRANS   :
-                  nonseq_trans ? NONSEQ_TRANS : SEQ_TRANS;
+                  nonseq_trans ? NONSEQ_TRANS : 
+                  seq_trans    ? SEQ_TRANS    : IDLE_TRANS;
 
-dff_rstn #(3) r_htrans (.clk(clk), .rstn(rstn), .d(htrans_d), .q(htrans_o));
+dff_rstn #(3) r_htrans (.clk(clk), .rstn(rstn), .d(htrans_d), .q(HTRANS_o));
 
 //===================================
-// Beat Counter
-assign bcnt_en  =   nxt_trans_vld       &
-                    (nxt_state != ST_IDLE) &
-                    (nxt_state != ST_BUSY);
+// Beat_Counter
+assign bcnt_en  =   ap_done       &
+                    (~last_beat);
 
-assign bcnt_clr = cmd_vld;
+assign bcnt_clr = cmd_vld |
+                  err_resp;
 assign bcnt_d   = bcnt_clr ? '0 : 
-                  bcnt_en  ? (bcnt_r + 1'b1) : bcnt_r;
+                  (bcnt_en)  ? (bcnt_r + 1'b1) : bcnt_r;
 dff_rstn #(5) r_bcnt (.clk(clk), .rstn(rstn), .d(bcnt_d), .q(bcnt_r));
 
 assign last_beat =   //burst_d  == 3'b000 |
@@ -258,7 +273,7 @@ assign last_beat =   //burst_d  == 3'b000 |
                     ((hburst_d[2:1] == 2'b11)  && (bcnt_r == 5'd15));              //WRAP16 or INCR16
 
 //===================================
-//• ADDRESS GENERATOR
+//• ADDRESS_GENERATOR
 
 //All transfers in a burst must be aligned to the address boundary equal to the size of the transfer. For example, word 
 //transfers must align to word address boundaries (HADDR[1:0] = 0b00), and halfword transfers to halfword address 
@@ -276,9 +291,7 @@ assign addr_aligned  = (hsize_d == 3'b000) ? addr_i                     :
 //HSIZE in conjunction with HBURST determines the address boundary for wrapping bursts.
 
 //Address With Increase Mode
-//Incrementing bursts access sequential locations and the address of each transfer in the burst is an increment of the previous address.
-
-
+//Incrementing bursts access sequential locations and the address of each transfer in the burst is an increment of the previous address
 
 assign inc_burst_mode  = (cur_state == ST_BURST) & ((hburst_d == HBURST_INCR)     | 
                                                     (hburst_d == HBURST_INCR4)    |
@@ -296,13 +309,14 @@ assign wrap_burst_en   = wrap_burst_mode &
                          nxt_trans_vld   &
                          (~last_beat);
 
-assign nxt_addr_incr = ((hsize_d == 3'b000) & (cur_state == ST_BURST)) ?  (haddr_o + 8'd1 )  : 
-                       ((hsize_d == 3'b001) & (cur_state == ST_BURST)) ?  (haddr_o + 8'd2 )  :
-                       ((hsize_d == 3'b010) & (cur_state == ST_BURST)) ?  (haddr_o + 8'd4 )  :
-                       ((hsize_d == 3'b011) & (cur_state == ST_BURST)) ?  (haddr_o + 8'd8 )  :
-                       ((hsize_d == 3'b100) & (cur_state == ST_BURST)) ?  (haddr_o + 8'd16)  :
-                       ((hsize_d == 3'b101) & (cur_state == ST_BURST)) ?  (haddr_o + 8'd32)  :
-                       ((hsize_d == 3'b110) & (cur_state == ST_BURST)) ?  (haddr_o + 8'd64)  : (haddr_o + 8'd128);
+assign nxt_addr_incr = ((hsize_d == 3'b000) & (cur_state == ST_BURST)) ?  (HADDR_o + 8'd1 )  : 
+                       ((hsize_d == 3'b001) & (cur_state == ST_BURST)) ?  (HADDR_o + 8'd2 )  :
+                       ((hsize_d == 3'b010) & (cur_state == ST_BURST)) ?  (HADDR_o + 8'd4 )  :
+                       ((hsize_d == 3'b011) & (cur_state == ST_BURST)) ?  (HADDR_o + 8'd8 )  :
+                       ((hsize_d == 3'b100) & (cur_state == ST_BURST)) ?  (HADDR_o + 8'd16)  :
+                       ((hsize_d == 3'b101) & (cur_state == ST_BURST)) ?  (HADDR_o + 8'd32)  :
+                       ((hsize_d == 3'b110) & (cur_state == ST_BURST)) ?  (HADDR_o + 8'd64)  : 
+                       ((hsize_d == 3'b111) & (cur_state == ST_BURST)) ?  (HADDR_o + 8'd128) : HADDR_o;
 
 //• Wrapping bursts wrap when they cross an address boundary. The address boundary is calculated as the 
 //product of the number of beats in a burst and the size of the transfer. The number of beats are controlled by 
@@ -360,9 +374,9 @@ assign wrap_en         = (nxt_addr_incr >  addr_wrap_point) &
 assign nxt_addr_wrap   = wrap_en ? addr_base : nxt_addr_incr;
 assign haddr_d         = cmd_vld_i       ? addr_aligned  :
                          wrap_burst_en   ? nxt_addr_wrap :       
-                         inc_burst_en    ? nxt_addr_incr : haddr_o;
+                         inc_burst_en    ? nxt_addr_incr : HADDR_o;
 
-dff_rstn #(ADDR_W) r_haddr (.clk(clk), .rstn(rstn), .d(haddr_d), .q(haddr_o));
+dff_rstn #(ADDR_W) r_haddr (.clk(clk), .rstn(rstn), .d(haddr_d), .q(HADDR_o));
 
 
 

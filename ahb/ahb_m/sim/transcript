@@ -20,13 +20,21 @@
 # 
 # stdin: <EOF>
 do wave.do
-dataset reload -f
-# vsim:/testbench
-dataset reload -f
-# vsim:/testbench
 add wave -position insertpoint  \
-vsim:/testbench/dut/u_ahb_m/operand_b \
-vsim:/testbench/dut/u_ahb_m/operand_a
+vsim:/testbench/dut/u_ahb_m/ap_done
 dataset reload -f
 # vsim:/testbench/dut/u_ahb_m
-find drivers -source -time {305000 ps} -cause vsim:/testbench/dut/u_ahb_s/u_ahb_s/ap_done
+dataset reload -f
+# vsim:/testbench/dut/u_ahb_m
+find drivers -source -time {150539 ps} -cause vsim:/testbench/dut/u_ahb_m/HADDR_o
+# 
+# ===================================================================================
+# *PARTIAL* causality trace results for signal "vsim:/testbench/dut/u_ahb_m/HADDR_o":
+# 
+#  Time | Type | Scope                          | Signal                    | Source File
+# ----- | ---- | ------------------------------ | ------------------------- | --------------------------------------------------------------------------------
+# 95 ns | FF   | /testbench/dut/u_ahb_m/r_haddr | d[31:0]                   | ../rtl/dff_rstn.sv:20
+# 85 ns | Mux  | /testbench/dut/u_ahb_m         | dbgTemp43_haddr_d_2[31:0] | ../rtl/ahb_m.sv:375
+# 85 ns | Mux  | /testbench/dut/u_ahb_m         | dbgTemp43_haddr_d_1[31:0] | ../rtl/ahb_m.sv:375
+# 85 ns | Mux  | /testbench/dut/u_ahb_m         | nxt_addr_incr[31:0]       | ../rtl/ahb_m.sv:375
+find drivers -source -time {69161 ps} -cause vsim:/testbench/dut/u_ahb_m/HADDR_o

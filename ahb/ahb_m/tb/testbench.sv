@@ -5,7 +5,7 @@ module testbench;
 parameter DATA_W   = 32;
 parameter ADDR_W   = 32;
 parameter BEAT_LEN = 5;
-parameter WAIT_NUM = 5;
+parameter WAIT_NUM = 0;
 
 logic                clk;
 logic                rstn;
@@ -79,17 +79,21 @@ initial begin
     cmd_vld_i <= 1'b1;
     cmd_id_i  <= 4'd1;
     len_i     <= 5'd1;
-    burst_i   <= 3'b010;
+    burst_i   <= 3'b101;
     write_i   <= 1'b1;
-    size_i    <= 3'b001;
-    addr_i    <= 32'd29;
+    size_i    <= 3'b010;
+    addr_i    <= 32'h010;
 
     //Deassert command valid
     @(posedge clk);
     cmd_vld_i <= 1'b0;
+    repeat(2)@(posedge clk);
+    busy_i <= 1'b1;
+    repeat(5)@(posedge clk);
+    busy_i <= 1'b0;
 
        //Wait for transaction
-    repeat(200) @(posedge clk);
+    repeat(500) @(posedge clk);
 
     $finish;
 end

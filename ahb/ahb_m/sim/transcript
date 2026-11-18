@@ -20,13 +20,13 @@
 # 
 # stdin: <EOF>
 do wave.do
+dataset reload -f
+# vsim:/testbench
+dataset reload -f
+# vsim:/testbench
 add wave -position insertpoint  \
-vsim:/testbench/dut/u_ahb_m/hsize_d
+vsim:/testbench/dut/u_ahb_m/operand_b \
+vsim:/testbench/dut/u_ahb_m/operand_a
 dataset reload -f
 # vsim:/testbench/dut/u_ahb_m
-dataset reload -f
-# vsim:/testbench/dut/u_ahb_m
-find drivers -source -time {302896 ps} -cause vsim:/testbench/dut/u_ahb_m/nxt_trans_vld
-dataset reload -f
-# doVOpenFlatFile(): INTERNAL ERROR: page load failed for file /home/vinhha/x/ahb/ahb_m/sim/work/dff_rstn/_primary.dbs (0:0 1:1 71 0 405 1794908505 0x10b:0x101)
-# vsim:/testbench/dut/u_ahb_s/u_ahb_s/r_hrdo
+find drivers -source -time {305000 ps} -cause vsim:/testbench/dut/u_ahb_s/u_ahb_s/ap_done

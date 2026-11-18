@@ -3,17 +3,38 @@
 // File         : ahb_m_v2.sv
 // Author       : vinhha
 // Created      : 2026-11-15
-// Last Modified: 2026-11-17
+// Last Modified: 2026-11-18
 //==============================================================================
 // Description  :
 //
 //==============================================================================
+
+//HSIZE [2:0] indicates the size of data transfer
+//HSIZE [2:0] = 3'b000 - 1 byte
+//HSIZE [2:0] = 3'b001 - Halfword
+//HSIZE [2:0] = 3'b010 - Word  
+//HSIZE [2:0] = 3'b011 - DoubleWord  
+//HSIZE [2:0] = 3'b100 - 4-Word Line  
+//HSIZE [2:0] = 3'b101 - 8-Word Line  
+
+//INCR   = 3'b001;
+//WRAP4  = 3'b010;
+//INCR4  = 3'b011;
+//WRAP8  = 3'b100;
+//INCR8  = 3'b101;
+//WRAP16 = 3'b110;
+//INCR16 = 3'b111;
+
+
+
+
 module ahb_m #(
 parameter   DATA_W =32,
 parameter   ADDR_W =32,
 parameter   BEAT_LEN =5
-)(
-input  logic                clk,
+)( 
+
+input  logic                clk, 
 input  logic                rstn,
 
 //User command Inteface
@@ -47,7 +68,17 @@ input  logic                hready_i,
 input  logic [DATA_W-1:0]   hrdata_i, 
 input  logic                hresp_i 
 ); 
+;
+localparam [2:0] HBURST_INCR   = 3'b001;
+localparam [2:0] HBURST_WRAP4  = 3'b010;
+localparam [2:0] HBURST_INCR4  = 3'b011;
+localparam [2:0] HBURST_WRAP8  = 3'b100;
+localparam [2:0] HBURST_INCR8  = 3'b101;
+localparam [2:0] HBURST_WRAP16 = 3'b110;
+localparam [2:0] HBURST_INCR16 = 3'b111;
 
+
+//All transfers in a burst must be
 //Command & Address Declared
 logic                       cmd_vld;
 logic                       ap_done;
@@ -62,6 +93,7 @@ logic [ADDR_W-1:0]          addr_base;
 logic [11:0]                addr_bound;
 logic [ADDR_W-1:0]          addr_wrap_point;
 logic [ADDR_W-1:0]          addr_store;
+logic [ADDR_W-1:0]          addr_aligned;
 logic                       wrap_burst_en; 
 logic [ADDR_W-1:0]          nxt_addr;
 logic [ADDR_W-1:0]          nxt_addr_incr;
@@ -70,7 +102,9 @@ logic                       inc_burst_mode;
 logic                       wrap_burst_mode;
 logic                       inc_burst_en;
 logic [7:0]                 bit_mask;
-logic [3:0]                 wrap_type;
+logic [ADDR_W-1:0]          wrap_type;
+logic [ADDR_W-1:0]          operand_a;
+logic [ADDR_W-1:0]          operand_b;
 
 
 logic [2:0]                 hburst_d;
@@ -173,7 +207,7 @@ dff_rstn #(DATA_W) r_wdata (.clk(clk), .rstn(rstn), .d(wdata_i), .q(hwdata_o));
 //===================================
 //Address Phase
 assign ap_done = htrans_o[1] &
-                 (cur_state != 2'b00)    &
+                 (cur_state != ST_IDLE)    &
                  hready_i    ;
 
 //Data Phase
@@ -225,34 +259,33 @@ assign last_beat =   //burst_d  == 3'b000 |
 
 //===================================
 //• ADDRESS GENERATOR
+
+//All transfers in a burst must be aligned to the address boundary equal to the size of the transfer. For example, word 
+//transfers must align to word address boundaries (HADDR[1:0] = 0b00), and halfword transfers to halfword address 
+//boundaries (HADDR[0] = 0). 
+
+assign addr_aligned  = (hsize_d == 3'b000) ? addr_i                     :
+                       (hsize_d == 3'b001) ? {addr_i[ADDR_W-1:1], 1'b0} :
+                       (hsize_d == 3'b010) ? {addr_i[ADDR_W-1:2], 2'b0} :
+                       (hsize_d == 3'b011) ? {addr_i[ADDR_W-1:3], 3'b0} :
+                       (hsize_d == 3'b100) ? {addr_i[ADDR_W-1:4], 4'b0} :
+                       (hsize_d == 3'b101) ? {addr_i[ADDR_W-1:5], 5'b0} :
+                       (hsize_d == 3'b110) ? {addr_i[ADDR_W-1:6], 6'b0} :  {addr_i[ADDR_W-1:7], 7'b0};
+
 //HSIZE [2:0] indicates the size of data transfer
 //HSIZE in conjunction with HBURST determines the address boundary for wrapping bursts.
 
-
 //Address With Increase Mode
 //Incrementing bursts access sequential locations and the address of each transfer in the burst is an increment of the previous address.
-//HSIZE [2:0] indicates the size of data transfer
-//HSIZE [2:0] = 3'b000 - 1 byte
-//HSIZE [2:0] = 3'b001 - Halfword
-//HSIZE [2:0] = 3'b010 - Word  
-//HSIZE [2:0] = 3'b011 - DoubleWord  
-//HSIZE [2:0] = 3'b100 - 4-Word Line  
-//HSIZE [2:0] = 3'b101 - 8-Word Line  
-localparam [2:0] HBURST_SINGLE = 3'b000;
-localparam [2:0] HBURST_INCR   = 3'b001;
-localparam [2:0] HBURST_WRAP4  = 3'b010;
-localparam [2:0] HBURST_INCR4  = 3'b011;
-localparam [2:0] HBURST_WRAP8  = 3'b100;
-localparam [2:0] HBURST_INCR8  = 3'b101;
-localparam [2:0] HBURST_WRAP16 = 3'b110;
-localparam [2:0] HBURST_INCR16 = 3'b111;
+
+
 
 assign inc_burst_mode  = (cur_state == ST_BURST) & ((hburst_d == HBURST_INCR)     | 
                                                     (hburst_d == HBURST_INCR4)    |
                                                     (hburst_d == HBURST_INCR8)    |
                                                     (hburst_d == HBURST_INCR16));
 
-assign wrap_burst_mode =  (cur_state == ST_BURST) & ((hburst_d == HBURST_WRAP4)    |
+assign wrap_burst_mode = (cur_state == ST_BURST) & ((hburst_d == HBURST_WRAP4)    |
                                                     (hburst_d == HBURST_WRAP8)    |
                                                     (hburst_d == HBURST_WRAP16));
 
@@ -283,11 +316,11 @@ assign nxt_addr_incr = ((hsize_d == 3'b000) & (cur_state == ST_BURST)) ?  (haddr
 //Algorism:                     
 //                   Addr_input 
 //                        & 
-//                  (Hsize << 1'b1)
+//                 Address Bound 
 //                ---------------------
 //                   BaseAddress        
 
-//Wrap Address = BaseAddress + AddrBoundary
+//Wrap Address = BaseAddress + AddrBoundary - 1
 assign wrap_type  = (wrap_burst_mode & (hburst_d == HBURST_WRAP4))  ? 4'b0010 :
                     (wrap_burst_mode & (hburst_d == HBURST_WRAP8))  ? 4'b0100 :
                     (wrap_burst_mode & (hburst_d == HBURST_WRAP16)) ? 4'b1000 : 4'b0000;
@@ -301,16 +334,31 @@ assign addr_bound = ((hsize_d == 3'b000) & wrap_burst_mode) ?  (wrap_type << 4'd
                     ((hsize_d == 3'b110) & wrap_burst_mode) ?  (wrap_type << 4'd7)  : 
                     ((hsize_d == 3'b111) & wrap_burst_mode) ?  (wrap_type << 4'd8)  : '0;
 
-assign addr_store = cmd_vld_i ? addr_i : haddr_r;
+assign operand_a  = (wrap_burst_mode & (hburst_d == HBURST_WRAP4))  ? {{(ADDR_W-1){1'b1}}, 1'b0}:
+                    (wrap_burst_mode & (hburst_d == HBURST_WRAP8))  ? {{(ADDR_W-2){1'b1}}, 2'b0}:
+                    (wrap_burst_mode & (hburst_d == HBURST_WRAP16)) ? {{(ADDR_W-3){1'b1}}, 3'b0}: '0;
+
+assign operand_b =  ((hsize_d == 3'b000) & wrap_burst_mode) ?  (operand_a << 4'd1)  : 
+                    ((hsize_d == 3'b001) & wrap_burst_mode) ?  (operand_a << 4'd2)  :
+                    ((hsize_d == 3'b010) & wrap_burst_mode) ?  (operand_a << 4'd3)  :
+                    ((hsize_d == 3'b011) & wrap_burst_mode) ?  (operand_a << 4'd4)  :
+                    ((hsize_d == 3'b100) & wrap_burst_mode) ?  (operand_a << 4'd5)  :
+                    ((hsize_d == 3'b101) & wrap_burst_mode) ?  (operand_a << 4'd6)  :
+                    ((hsize_d == 3'b110) & wrap_burst_mode) ?  (operand_a << 4'd7)  : 
+                    ((hsize_d == 3'b111) & wrap_burst_mode) ?  (operand_a << 4'd8)  : '0;
+
+assign addr_store = cmd_vld_i ? addr_aligned : haddr_r;
 dff_rstn #(ADDR_W) r_haddr_1 (.clk(clk), .rstn(rstn), .d(addr_store), .q(haddr_r));
 
-assign addr_base       =  haddr_r   &  (addr_bound); 
+//assign addr_base       =  haddr_r   &  (addr_bound); 
+assign addr_base       =  haddr_r   &  (operand_b); 
+
 assign addr_wrap_point =  addr_base +  (addr_bound - 1'd1);
 assign wrap_en         = (nxt_addr_incr >  addr_wrap_point) & 
                          (cur_state == ST_BURST); 
 
 assign nxt_addr_wrap   = wrap_en ? addr_base : nxt_addr_incr;
-assign haddr_d         = cmd_vld_i       ? addr_i        :
+assign haddr_d         = cmd_vld_i       ? addr_aligned  :
                          wrap_burst_en   ? nxt_addr_wrap :       
                          inc_burst_en    ? nxt_addr_incr : haddr_o;
 

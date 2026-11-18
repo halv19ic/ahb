@@ -81,8 +81,8 @@ initial begin
     len_i     <= 5'd1;
     burst_i   <= 3'b010;
     write_i   <= 1'b1;
-    size_i    <= 3'b010;
-    addr_i    <= 32'd28;
+    size_i    <= 3'b001;
+    addr_i    <= 32'd29;
 
     //Deassert command valid
     @(posedge clk);

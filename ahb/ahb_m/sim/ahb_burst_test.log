@@ -1,6 +1,7 @@
 # vsim -sv_seed 1 -debugDB -l ahb_burst_test.log -voptargs="+acc" -assertdebug -c testbench "+TESTNAME=ahb_burst_test" -do "log -r /*; run -all; quit -f" 
-# Start time: 16:56:00 on Nov 17,2026
-# ** Note: (vsim-8009) Loading existing optimized design _opt
+# Start time: 10:21:34 on Nov 18,2026
+# ** Note: (vsim-3813) Design is being optimized due to module recompilation...
+# ** Note: (vsim-8611) Generating debug db.
 # //  Questa Sim-64
 # //  Version 2021.2_1 linux_x86_64 May 15 2021
 # //
@@ -30,10 +31,10 @@
 # Loading work.dff_rstn(fast__5)
 # Loading work.regfile(fast)
 # ** Warning: (vsim-3015) [PCDPC] - Port size (3) does not match connection size (2) for port 'd'. The port definition is at: ../rtl/dff_rstn.sv(15).
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/u_ahb_m/r_htrans File: ../rtl/ahb_m.sv Line: 207
+#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/u_ahb_m/r_htrans File: ../rtl/ahb_m.sv Line: 241
 # ** Warning: (vsim-3015) [PCDPC] - Port size (3) does not match connection size (2) for port 'q'. The port definition is at: ../rtl/dff_rstn.sv(16).
-#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/u_ahb_m/r_htrans File: ../rtl/ahb_m.sv Line: 207
-# ** Note: (vsim-8716) Reusing existing debug database vsim.dbg.
+#    Time: 0 ps  Iteration: 0  Instance: /testbench/dut/u_ahb_m/r_htrans File: ../rtl/ahb_m.sv Line: 241
+# ** Note: (vsim-8900) Creating design debug database vsim.dbg.
 # log -r /*
 #  run -all
 # Time | CMD_VLD | CMD_READY | STATE | HTRANS | HADDR | HREADY
@@ -43,15 +44,15 @@
 # 65000 | 0 | 0 | 11 | 11 | 0000001c | 1
 # 75000 | 0 | 0 | 11 | 11 | 0000001c | 0
 # 125000 | 0 | 0 | 11 | 11 | 0000001c | 1
-# 135000 | 0 | 0 | 11 | 11 | 00000010 | 0
-# 185000 | 0 | 0 | 11 | 11 | 00000010 | 1
-# 195000 | 0 | 0 | 11 | 11 | 00000014 | 0
-# 245000 | 0 | 0 | 11 | 11 | 00000014 | 1
-# 255000 | 0 | 0 | 11 | 11 | 00000018 | 0
-# 305000 | 0 | 0 | 11 | 11 | 00000018 | 1
-# 315000 | 0 | 1 | 00 | 00 | 00000018 | 0
-# 365000 | 0 | 1 | 00 | 00 | 00000018 | 1
+# 135000 | 0 | 0 | 11 | 11 | 0000001e | 0
+# 185000 | 0 | 0 | 11 | 11 | 0000001e | 1
+# 195000 | 0 | 0 | 11 | 11 | 00000018 | 0
+# 245000 | 0 | 0 | 11 | 11 | 00000018 | 1
+# 255000 | 0 | 0 | 11 | 11 | 0000001a | 0
+# 305000 | 0 | 0 | 11 | 11 | 0000001a | 1
+# 315000 | 0 | 1 | 00 | 00 | 0000001a | 0
+# 365000 | 0 | 1 | 00 | 00 | 0000001a | 1
 # ** Note: $finish    : ../tb/testbench.sv(94)
 #    Time: 2065 ns  Iteration: 1  Instance: /testbench
-# End time: 16:56:03 on Nov 17,2026, Elapsed time: 0:00:03
+# End time: 10:21:40 on Nov 18,2026, Elapsed time: 0:00:06
 # Errors: 0, Warnings: 2
